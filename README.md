@@ -34,8 +34,10 @@ like this LineageOS-20.1-a035fxxnn-arm64-gapps.7z
 <br>3. Add Baseband Version </br>
 
 <br>4. Add Super Img Link
+  - Use super.zip(Recommended to reduce downloading time)
   - Use direct Link or remove /download from the ending of link if you use sourceforge link
   - Link must be end like super.img , super.zip or super.xz
+ # Wait for 20-25 minutes to finish the build 
  # Credits:
  These people have helped this project in some way or another, so they should be the ones who receive all the credit:
 - [Phhusson](https://github.com/phhusson)
