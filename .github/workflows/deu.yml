@@ -41,9 +41,9 @@ jobs:
     - name: Install Python 2 and gdown
       run: |
         sudo apt update
-        sudo apt install -y python2
-        sudo apt install -y python-pip
-        pip install gdown
+        sudo apt install -y python3
+        sudo apt install -y python3-pip
+        pip3 install gdown
 
     - name: Download Firmware and Extract SUPER from AP
       run: |
