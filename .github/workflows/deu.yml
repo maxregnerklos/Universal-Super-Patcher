@@ -44,7 +44,7 @@ jobs:
         sudo apt install -y python3
         sudo apt install -y python3-pip
         pip3 install gdown
-        sudo apt install -y lz4 && sudo apt install -y p7zip-full
+        sudo apt install -y lz4 && sudo apt install -y p7zip-full simg2img
 
     - name: Download Firmware and Extract SUPER from AP
       run: |
@@ -56,7 +56,8 @@ jobs:
         
     - name: Decompress super.img.lz4
       run: |
-        lz4 -d super.img.lz4
+        lz4 -d --force super.img.lz4
+        simg2img super.img super.img.raw
 
     - name: Installing Tools
       run: |
