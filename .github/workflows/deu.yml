@@ -52,7 +52,7 @@ jobs:
         gdown --id 1Ko5KGLyR1GXfsxAebiDAUdkEWbIpH_m6 -O firmware.zip
         unzip -P "" firmware.zip
         mv AP*.tar.md5 AP.tar
-        tar -xf AP.tar --wildcards 'AP/super.lz4' --strip-components=1
+        tar -xf AP.tar --wildcards 'AP/super.img.lz4' --strip-components=1
         
     - name: Decompress super.img.lz4
       run: |
