@@ -1,0 +1,90 @@
+name: SUPER PATCHER WITH CUSTOM GSI
+permissions:
+  contents: write
+on:
+  push:
+    branches:
+      - main  # Change this to your desired branch
+  workflow_dispatch:
+    inputs:
+      DEVICE:
+        description: 'Enter Your Device Name'
+        required: true
+        default: 'Samsung Galaxy A50 (A505F)'
+      GSI:
+        description: 'GSI Image Direct Link'
+        required: true
+        default: 'https://github.com/ponces/treble_build_aosp/releases/download/v2023.12.01/aosp-arm64-ab-gapps-14.0-20231201.img.xz'
+      NAME:
+        description: 'ROM Name'
+        required: true
+        default: 'aosp-arm64-ab-gapps-14.0-a50.7z'
+      VERSION:
+        description: 'Baseband Version'
+        required: true
+        default: 'A505FXXU5BTH8'
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y zip xz-utils unzip p7zip-full wget
+        sudo apt install simg2img -y
+
+    - name: Download Firmware and Extract SUPER from AP
+      run: |
+        cd ~
+        wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1Ko5KGLyR1GXfsxAebiDAUdkEWbIpH_m6' -O AP_A505FDDS9CWA2_CL24323734_QB61463234_REV00_user_low_ship_meta_OS11.tar.md5.zip
+        unzip AP_A505FDDS9CWA2_CL24323734_QB61463234_REV00_user_low_ship_meta_OS11.tar.md5.zip
+        tar -xf AP*.tar.md5 --wildcards 'AP/*.img' --strip-components=1
+        mv AP/*.img super.img
+
+    - name: Installing Tools
+      run: |
+        git clone https://github.com/Exynos-nigg/lpunpack-lpmake-mirror.git lpbinary
+        cd lpbinary
+        bash install.sh
+
+    - name: Downloading Your GSI And Extracting
+      run: |
+        cd lpbinary/binary
+        wget -q ${{ github.event.inputs.GSI }}
+        mkdir sys
+        mv *.xz sys
+        cd sys
+        unxz *.xz
+        mv *.img ../system.img
+        cd ..
+
+    - name: Packing
+      run: |
+        cd lpbinary/binary
+        if [ -f system_ext.img ]; then  ./lpmake --metadata-size 65536 --super-name super --metadata-slots 2 --device super:$(<super.txt) --group main:$(<main.txt) --partition system:readonly:$(ls -nl system.img | awk '{print $5}'):main --image system=system.img --partition vendor:readonly:$(ls -nl vendor.img | awk '{print $5}'):main --image vendor=vendor.img --partition product:readonly:$(ls -nl product.img | awk '{print $5}'):main --image product=product.img --partition system_ext:readonly:$(ls -nl system_ext.img | awk '{print $5}'):main --image system_ext=system_ext.img --sparse --output super.img; fi
+        if [ -f odm.img ]; then  ./lpmake --metadata-size 65536 --super-name super --metadata-slots 2 --device super:$(<super.txt) --group main:$(<main.txt) --partition system:readonly:$(ls -nl system.img | awk '{print $5}'):main --image system=system.img --partition vendor:readonly:$(ls -nl vendor.img | awk '{print $5}'):main --image vendor=vendor.img --partition product:readonly:$(ls -nl product.img | awk '{print $5}'):main --image product=product.img --partition odm:readonly:$(ls -nl odm.img | awk '{print $5}'):main --image odm=odm.img --sparse --output super.img; fi
+        rm system.img && rm product.img && rm vendor.img && rm -f odm.img && rm -f system_ext.img
+
+    - name: Creating tar and compressing to 7z
+      run: |
+        cd lpbinary/binary
+        tar -cvf super.tar super.img
+        7z a ${{ github.event.inputs.NAME }} super.tar
+        rm -rf super.tar
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: lpbinary/binary/${{ github.event.inputs.NAME }}
+        name: ${{ github.event.inputs.NAME }}-${{ github.run_id }}
+        tag_name: ${{ github.run_id }}
+        body: |
+          Device: ${{ github.event.inputs.DEVICE }}
+          Version: ${{ github.event.inputs.VERSION }}
+          ROM Name: ${{ github.event.inputs.NAME }}
+          Flash: Extract the 7z file and flash through ODIN in AP Section.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
