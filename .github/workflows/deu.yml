@@ -38,12 +38,13 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install Python 2 and gdown
+    - name: Install Python 2, gdown, and lz4
       run: |
         sudo apt update
         sudo apt install -y python3
         sudo apt install -y python3-pip
         pip3 install gdown
+        sudo apt install -y lz4
 
     - name: Download Firmware and Extract SUPER from AP
       run: |
@@ -53,6 +54,10 @@ jobs:
         mv AP*.tar.md5 AP.tar
         tar -xf AP.tar --wildcards 'AP/*.img' --strip-components=1
         mv AP/*.img super.img
+
+    - name: Decompress super.img.lz4
+      run: |
+        lz4 -d super.img.lz4
 
     - name: Installing Tools
       run: |
