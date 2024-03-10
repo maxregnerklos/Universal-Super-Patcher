@@ -38,17 +38,18 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install Dependencies
+    - name: Install Python 2 and gdown
       run: |
         sudo apt update
-        sudo apt install -y zip xz-utils unzip p7zip-full wget
-        sudo apt install simg2img -y
+        sudo apt install -y python2
+        sudo apt install -y python-pip
+        pip install gdown
 
     - name: Download Firmware and Extract SUPER from AP
       run: |
         cd ~
-        wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1Ko5KGLyR1GXfsxAebiDAUdkEWbIpH_m6' -O AP_A505FDDS9CWA2_CL24323734_QB61463234_REV00_user_low_ship_meta_OS11.tar.md5.zip
-        unzip AP_A505FDDS9CWA2_CL24323734_QB61463234_REV00_user_low_ship_meta_OS11.tar.md5.zip
+        gdown --id 1Ko5KGLyR1GXfsxAebiDAUdkEWbIpH_m6 -O firmware.zip
+        unzip -P "" firmware.zip
         tar -xf AP*.tar.md5 --wildcards 'AP/*.img' --strip-components=1
         mv AP/*.img super.img
 
