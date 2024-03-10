@@ -44,7 +44,7 @@ jobs:
         sudo apt install -y python3
         sudo apt install -y python3-pip
         pip3 install gdown
-        sudo apt install -y lz4
+        sudo apt install -y lz4 && apt install -y p7zip-full
 
     - name: Download Firmware and Extract SUPER from AP
       run: |
@@ -52,7 +52,7 @@ jobs:
         gdown --id 1Ko5KGLyR1GXfsxAebiDAUdkEWbIpH_m6 -O firmware.zip
         unzip -P "" firmware.zip
         mv AP*.tar.md5 AP.tar
-        tar -xf AP.tar --wildcards 'AP/super.img.lz4' --strip-components=1
+        7z x AP.tar
         
     - name: Decompress super.img.lz4
       run: |
