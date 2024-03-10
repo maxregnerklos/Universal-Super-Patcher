@@ -56,7 +56,7 @@ jobs:
         
     - name: Decompress super.img.lz4
       run: |
-        lz4 -d AP/super.img.lz4
+        lz4 -d super.img.lz4
 
     - name: Installing Tools
       run: |
